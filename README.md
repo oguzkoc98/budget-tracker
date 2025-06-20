@@ -1,6 +1,6 @@
 # 💰 budget-tracker
 
-![Budget Tracker](https://via.placeholder.com/800x400/3B82F6/FFFFFF?text=Cebimden+Budget+Tracker)
+![Budget Tracker]
 
 ## 🎯 Proje Özeti
 
@@ -71,6 +71,6 @@ budget-tracker/
 
 ### 📧 İletişim
 
-**E-posta:** [oguzkoc98@gmail.com]  
-**LinkedIn:** [LinkedIn Profiliniz]  
+**E-posta:** oguzkoc98@gmail.com  
+**LinkedIn:** [LinkedIn Profiliniz](https://www.linkedin.com/in/oguzkoc98/)
 **GitHub:** [GitHub Profiliniz]
