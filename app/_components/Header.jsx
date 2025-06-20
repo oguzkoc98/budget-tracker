@@ -5,8 +5,9 @@ import Image from "next/image";
 
 // components
 import { Button } from "@/components/ui/button";
-import { useUser, UserButton } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import CustomUserDropdown from "@/app/(routes)/dashboard/_components/CustomUserDropdown";
 
 function Header() {
   const { user, isSignedIn } = useUser();
@@ -28,14 +29,14 @@ function Header() {
         </div>
       </Link>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end items-center">
         {isSignedIn ? (
-          <>
-            <Button className="bg-blue-800 hover:bg-blue-900 rounded-3xl mr-3">
+          <div className="flex items-center gap-3">
+            <Button className="bg-blue-800 hover:bg-blue-900 rounded-3xl">
               <Link href={"/dashboard"}>Genel Bakış</Link>
             </Button>
-            <UserButton />
-          </>
+            <CustomUserDropdown size="default" position="bottom" />
+          </div>
         ) : (
           <Link href={"/sign-in"}>
             <Button className="bg-blue-800 hover:bg-blue-900">

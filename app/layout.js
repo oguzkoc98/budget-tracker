@@ -23,8 +23,28 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: "#1e40af",
+        },
+        elements: {
+          userButtonPopoverCard: {
+            zIndex: 9999,
+          },
+          userButtonPopover: {
+            zIndex: 9999,
+          },
+        },
+      }}
+    >
       <html lang="tr">
+        <head>
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, user-scalable=no"
+          />
+        </head>
         <body className={`${inter.variable} antialiased font-sans`}>
           <Toaster />
           {children}

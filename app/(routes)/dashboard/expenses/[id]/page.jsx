@@ -30,7 +30,7 @@ import {
 import BudgetItem from "../../budgets/_components/BudgetItem";
 import ExpensesListTable from "../_components/ExpensesListTable";
 import EditBudget from "../_components/EditBudget";
-import { Calendar } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import moment from "moment";
 
 // Yükleme skeleton bileşeni - BudgetItem'a uygun
@@ -410,8 +410,68 @@ function ExpensesScreen({ params }) {
   }
 
   return (
-    <div className="p-5 pl-10">
-      <div className="flex justify-between items-center mb-4">
+    <div className="p-3 sm:p-5 md:pl-10">
+      {/* Mobil için üst header */}
+      <div className="block md:hidden mb-4">
+        <button
+          onClick={() => router.push("/dashboard/expenses")}
+          className="text-sm text-gray-500 hover:text-gray-700 transition-colors flex items-center gap-1 mb-3"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Harcamalara Dön
+        </button>
+
+        <div className="flex flex-col gap-3">
+          <h1 className="font-bold text-xl leading-tight">
+            {budgetInfo ? (
+              <>
+                <span className="text-blue-800 font-bold block">
+                  {budgetInfo.name}
+                </span>
+                <span className="text-gray-800 font-medium text-lg">
+                  Bütçesinin Harcamaları
+                </span>
+              </>
+            ) : (
+              <span className="text-gray-800">Harcamalar</span>
+            )}
+          </h1>
+
+          <div className="flex gap-2 flex-wrap">
+            <EditBudget
+              budgetInfo={budgetInfo}
+              refreshData={() => getBudgetInfo()}
+            />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="bg-red-500 hover:bg-red-700 text-sm px-3 py-2">
+                  Sil
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-gray-800">
+                    Bütçeyi Silmek İstiyor Musunuz?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Bu işlemle birlikte bu bütçeye ait tüm harcama kayıtları da
+                    silinecek. Bu işlemi geri alamazsınız. Emin misiniz?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Vazgeç</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteBudget()}>
+                    Evet
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop için header */}
+      <div className="hidden md:flex justify-between items-center mb-4">
         <div className="flex items-center gap-3">
           <h2 className="font-bold text-2xl">
             {budgetInfo ? (
@@ -465,7 +525,7 @@ function ExpensesScreen({ params }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 mt-6 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 mt-4 md:mt-6 gap-3 md:gap-5">
         {budgetInfo ? (
           <BudgetItem budget={budgetInfo} />
         ) : (
@@ -482,8 +542,10 @@ function ExpensesScreen({ params }) {
         )}
       </div>
 
-      <div className="mt-15">
-        <h2 className="font-bold text-lg text-gray-800">Geçmiş Harcamalar</h2>
+      <div className="mt-8 md:mt-15">
+        <h2 className="font-bold text-lg md:text-xl text-gray-800 mb-3 md:mb-4">
+          Geçmiş Harcamalar
+        </h2>
         <ExpensesListTable
           expensesList={expensesList}
           refreshData={refreshData}

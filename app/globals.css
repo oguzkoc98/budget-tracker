@@ -119,3 +119,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobil Touch Optimizasyonları */
+@layer utilities {
+  /* Clerk UserButton için mobil optimizasyonu */
+  .cl-userButtonTrigger {
+    touch-action: manipulation !important;
+    -webkit-touch-callout: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .cl-userButtonPopover {
+    z-index: 9999 !important;
+  }
+
+  .cl-userButtonPopoverCard {
+    z-index: 9999 !important;
+  }
+
+  /* Mobil cihazlar için genel touch optimizasyonu */
+  @media (hover: none) and (pointer: coarse) {
+    .cl-userButtonTrigger {
+      cursor: default !important;
+    }
+
+    .cl-userButtonTrigger:active {
+      transform: scale(0.95);
+      transition: transform 0.1s ease;
+    }
+  }
+}

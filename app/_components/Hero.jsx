@@ -46,7 +46,7 @@ function Hero() {
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-            Akıllı <span className="text-blue-600">Bütçe Takip Uygulaması</span>
+            Akıllı <span className="text-blue-800">Bütçe Takip Uygulaması</span>
           </h1>
 
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">

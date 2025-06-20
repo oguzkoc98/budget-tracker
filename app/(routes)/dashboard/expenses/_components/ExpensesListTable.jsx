@@ -109,19 +109,27 @@ function ExpensesListTable({ expensesList, refreshData, onEditExpense }) {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200">
                     <button
                       onClick={() => onEditExpense && onEditExpense(expense)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                      className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg active:scale-95 transition-all duration-150"
                       title="Harcamayı düzenle"
+                      style={{
+                        touchAction: "manipulation",
+                        WebkitTouchCallout: "none",
+                      }}
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => deleteExpense(expense)}
                       disabled={deletingId === expense.id}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-all duration-150"
                       title="Harcamayı sil"
+                      style={{
+                        touchAction: "manipulation",
+                        WebkitTouchCallout: "none",
+                      }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
