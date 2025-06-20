@@ -1,7 +1,5 @@
 # 💰 budget-tracker
 
-![Budget Tracker]
-
 ## 🎯 Proje Özeti
 
 Next.js, Drizzle ORM ve Clerk Auth kullanılarak geliştirilmiş modern bir bütçe takip uygulaması. Gelir ve giderlerinizi takip edin, harcama trendlerinizi analiz edin.
@@ -72,5 +70,5 @@ budget-tracker/
 ### 📧 İletişim
 
 **E-posta:** oguzkoc98@gmail.com  
-**LinkedIn:** [LinkedIn Profiliniz](https://www.linkedin.com/in/oguzkoc98/)
-**GitHub:** [GitHub Profiliniz]
+**LinkedIn:** [LinkedIn](https://www.linkedin.com/in/oguzkoc98/)
+**GitHub:** [GitHub](https://github.com/oguzkoc98)
