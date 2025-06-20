@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 💰 budget-tracker
 
-## Getting Started
+![Budget Tracker](https://via.placeholder.com/800x400/3B82F6/FFFFFF?text=Cebimden+Budget+Tracker)
 
-First, run the development server:
+## 🎯 Proje Özeti
+
+Next.js, Drizzle ORM ve Clerk Auth kullanılarak geliştirilmiş modern bir bütçe takip uygulaması. Gelir ve giderlerinizi takip edin, harcama trendlerinizi analiz edin.
+
+**Temel Özellikler:**
+
+- 🔐 Güvenli kullanıcı kimlik doğrulama
+- 💳 Kategori bazlı bütçe yönetimi
+- 📊 İnteraktif grafikler ve analiz
+- 📱 Responsive tasarım
+
+## 🛠️ Teknoloji Stack
+
+### Frontend
+
+- **Next.js 15** - React framework (App Router)
+- **Tailwind CSS** - Modern CSS framework
+- **shadcn/ui** - UI komponent kütüphanesi
+- **Recharts** - Grafik görselleştirme
+
+### Backend & Database
+
+- **Drizzle ORM** - Type-safe SQL ORM
+- **PostgreSQL** - Veritabanı (Neon serverless)
+- **Clerk** - Kimlik doğrulama
+
+## 🚀 Kurulum
 
 ```bash
+# Projeyi klonlayın
+git clone https://github.com/[kullanıcı-adınız]/budget-tracker.git
+
+# Bağımlılıkları yükleyin
+npm install
+
+# Ortam değişkenlerini ayarlayın (.env.local)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_key
+CLERK_SECRET_KEY=your_secret
+DATABASE_URL=your_database_url
+
+# Veritabanını ayarlayın
+npm run db:push
+
+# Projeyi çalıştırın
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📁 Proje Yapısı
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```
+budget-tracker/
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Kimlik doğrulama
+│   ├── (routes)/dashboard/ # Ana uygulama
+│   └── _components/       # Paylaşılan bileşenler
+├── components/ui/         # UI bileşenleri
+├── utils/                 # Database config
+└── middleware.ts          # Auth middleware
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌐 Demo
 
-## Learn More
+**Canlı Demo:** [Vercel'de görüntüle](#)  
+**Kaynak Kod:** [GitHub'da görüntüle](#)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 📧 İletişim
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**E-posta:** [oguzkoc98@gmail.com]  
+**LinkedIn:** [LinkedIn Profiliniz]  
+**GitHub:** [GitHub Profiliniz]
