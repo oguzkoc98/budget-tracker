@@ -1,4 +1,4 @@
-# 💰 budget-tracker
+budget-tracker
 
 ## 🎯 Proje Özeti
 
@@ -70,5 +70,7 @@ budget-tracker/
 ### 📧 İletişim
 
 **E-posta:** oguzkoc98@gmail.com  
+
 **LinkedIn:** [LinkedIn](https://www.linkedin.com/in/oguzkoc98/)
+
 **GitHub:** [GitHub](https://github.com/oguzkoc98)
