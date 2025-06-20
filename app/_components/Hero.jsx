@@ -63,7 +63,7 @@ function Hero() {
               </button>
             </Link>
             <a
-              href="https://github.com"
+              href="https://github.com/oguzkoc98/budget-tracker"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-gray-900 px-8 py-3 text-lg font-medium transition-colors"

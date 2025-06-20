@@ -78,20 +78,13 @@ function Footer() {
                 <span className="text-sm">GitHub</span>
               </a>
               <a
-                href="[GitHub repo linki]"
+                href="https://github.com/oguzkoc98/budget-tracker"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-gray-300 hover:text-blue-400 transition-colors duration-200 group"
               >
                 <Github className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-200" />
                 <span className="text-sm">Proje Kaynak Kodu</span>
-              </a>
-              <a
-                href="mailto:oguzkoc98@gmail.com"
-                className="flex items-center text-gray-300 hover:text-blue-400 transition-colors duration-200 group"
-              >
-                <Mail className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform duration-200" />
-                <span className="text-sm">E-posta Gönder</span>
               </a>
             </div>
           </div>
