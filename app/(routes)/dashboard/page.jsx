@@ -355,25 +355,56 @@ function Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Kalan Bütçe</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm text-muted-foreground">
+                  {dashboardStats.totalBudgeted - dashboardStats.totalSpent < 0
+                    ? "Bütçe Aşımı"
+                    : "Kalan Bütçe"}
+                </p>
+                <p
+                  className={`text-2xl font-bold ${
+                    dashboardStats.totalBudgeted - dashboardStats.totalSpent < 0
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
                   {formatAmount(
-                    dashboardStats.totalBudgeted - dashboardStats.totalSpent
+                    Math.abs(
+                      dashboardStats.totalBudgeted - dashboardStats.totalSpent
+                    )
                   )}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {dashboardStats.totalBudgeted > 0
-                    ? `%${Math.round(
-                        ((dashboardStats.totalBudgeted -
-                          dashboardStats.totalSpent) /
-                          dashboardStats.totalBudgeted) *
-                          100
-                      )} harcanabilir`
+                    ? dashboardStats.totalBudgeted - dashboardStats.totalSpent <
+                      0
+                      ? `%${Math.round(
+                          ((dashboardStats.totalSpent -
+                            dashboardStats.totalBudgeted) /
+                            dashboardStats.totalBudgeted) *
+                            100
+                        )} aşım`
+                      : `%${Math.round(
+                          ((dashboardStats.totalBudgeted -
+                            dashboardStats.totalSpent) /
+                            dashboardStats.totalBudgeted) *
+                            100
+                        )} harcanabilir`
                     : "Bütçe tanımlanmamış"}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-green-600" />
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                  dashboardStats.totalBudgeted - dashboardStats.totalSpent < 0
+                    ? "bg-red-100"
+                    : "bg-green-100"
+                }`}
+              >
+                {dashboardStats.totalBudgeted - dashboardStats.totalSpent <
+                0 ? (
+                  <AlertTriangle className="w-6 h-6 text-red-600" />
+                ) : (
+                  <DollarSign className="w-6 h-6 text-green-600" />
+                )}
               </div>
             </div>
           </CardContent>

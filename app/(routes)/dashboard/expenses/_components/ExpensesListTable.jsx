@@ -1,20 +1,30 @@
 import { db } from "@/utils/dbConfig";
 import { Expenses } from "@/utils/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { Trash2, Calendar, TrendingUp, Wallet, Edit3 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useUser } from "@clerk/nextjs";
 
 function ExpensesListTable({ expensesList, refreshData, onEditExpense }) {
   const [deletingId, setDeletingId] = useState(null);
+  const { user } = useUser();
 
   const deleteExpense = async (expense) => {
+    if (!user) return;
+
     setDeletingId(expense.id);
     try {
+      // Sadece kullanıcının kendi harcamasını silebilir
       const result = await db
         .delete(Expenses)
-        .where(eq(Expenses.id, expense.id))
+        .where(
+          and(
+            eq(Expenses.id, expense.id),
+            eq(Expenses.createdBy, user?.primaryEmailAddress?.emailAddress)
+          )
+        )
         .returning();
 
       if (result) {
@@ -82,10 +92,26 @@ function ExpensesListTable({ expensesList, refreshData, onEditExpense }) {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-medium text-gray-900 text-base">
-                    {expense.name}
-                  </h4>
-                  <div className="text-right">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 text-base truncate">
+                      {expense.name}
+                    </h4>
+                    {/* Mobil: Bütçe adı harcama adının altında */}
+                    {expense.budgetName && (
+                      <div className="mt-1 sm:hidden">
+                        <Badge
+                          variant="outline"
+                          className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                        >
+                          <Wallet className="w-3 h-3 mr-1" />
+                          <span className="truncate max-w-[120px]">
+                            {expense.budgetName}
+                          </span>
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-right ml-2">
                     <div className="text-lg font-bold text-blue-800">
                       {formatAmount(expense.amount)}
                     </div>
@@ -98,13 +124,16 @@ function ExpensesListTable({ expensesList, refreshData, onEditExpense }) {
                       <Calendar className="w-4 h-4 mr-1.5" />
                       {formatDate(expense.createdAt)}
                     </div>
+                    {/* Desktop: Bütçe adı tarih ile aynı satırda */}
                     {expense.budgetName && (
                       <Badge
                         variant="outline"
-                        className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                        className="text-xs bg-blue-50 text-blue-700 border-blue-200 hidden sm:inline-flex"
                       >
                         <Wallet className="w-3 h-3 mr-1" />
-                        {expense.budgetName}
+                        <span className="truncate max-w-[150px]">
+                          {expense.budgetName}
+                        </span>
                       </Badge>
                     )}
                   </div>

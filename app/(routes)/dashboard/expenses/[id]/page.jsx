@@ -78,6 +78,7 @@ const EditExpense = ({ expense, refreshData, open, setOpen }) => {
 
   const onUpdateExpense = async () => {
     try {
+      const { user } = useUser();
       const result = await db
         .update(Expenses)
         .set({
@@ -85,7 +86,12 @@ const EditExpense = ({ expense, refreshData, open, setOpen }) => {
           amount: parseFloat(expenseAmount),
           createdAt: selectedDate,
         })
-        .where(eq(Expenses.id, expense.id))
+        .where(
+          and(
+            eq(Expenses.id, expense.id),
+            eq(Expenses.createdBy, user?.primaryEmailAddress?.emailAddress)
+          )
+        )
         .returning();
 
       if (result) {
@@ -163,15 +169,69 @@ const EditExpense = ({ expense, refreshData, open, setOpen }) => {
 };
 
 // Harcama Ekle Bileşeni - CreateBudget örneğine benzer yapı
-const AddExpense = ({ budgetId, user, refreshData }) => {
+const AddExpense = ({ budgetId, budgetAmount, user, refreshData }) => {
   const [expenseName, setExpenseName] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [open, setOpen] = useState(false);
+  const [showBudgetWarning, setShowBudgetWarning] = useState(false);
+  const [pendingExpense, setPendingExpense] = useState(null);
 
-  const onCreateExpense = async () => {
+  // Mevcut toplam harcamayı getir
+  const getCurrentTotalSpent = async () => {
+    try {
+      const result = await db
+        .select({
+          totalSpent: sql`COALESCE(SUM(CAST(${Expenses.amount} AS DECIMAL)), 0)`,
+        })
+        .from(Expenses)
+        .where(
+          and(
+            eq(Expenses.budgetId, parseInt(budgetId)),
+            eq(Expenses.createdBy, user?.primaryEmailAddress?.emailAddress)
+          )
+        );
+
+      return Number(result[0]?.totalSpent || 0);
+    } catch (error) {
+      console.error("Toplam harcama hesaplanırken hata:", error);
+      return 0;
+    }
+  };
+
+  // Bütçe aşımı kontrolü
+  const checkBudgetOverflow = async (newAmount) => {
+    if (!budgetAmount || !newAmount) return false;
+
+    const currentTotal = await getCurrentTotalSpent();
+    const newTotal = currentTotal + Number(newAmount);
+    const budgetLimit = Number(budgetAmount);
+
+    return newTotal > budgetLimit;
+  };
+
+  const handleExpenseSubmit = async () => {
+    // Bütçe aşımı kontrolü
+    const willOverflow = await checkBudgetOverflow(expenseAmount);
+
+    if (willOverflow) {
+      // Uyarı göster ve kullanıcı onayını bekle
+      setPendingExpense({
+        name: expenseName,
+        amount: expenseAmount,
+        date: selectedDate,
+      });
+      setShowBudgetWarning(true);
+      return;
+    }
+
+    // Doğrudan ekle
+    await onCreateExpense();
+  };
+
+  const onCreateExpense = async (forceAdd = false) => {
     try {
       const result = await db
         .insert(Expenses)
@@ -179,12 +239,17 @@ const AddExpense = ({ budgetId, user, refreshData }) => {
           name: expenseName,
           amount: parseFloat(expenseAmount),
           budgetId: parseInt(budgetId),
+          createdBy: user?.primaryEmailAddress?.emailAddress,
           createdAt: selectedDate,
         })
         .returning({ insertedId: Expenses.id });
 
       if (result) {
-        toast("Yeni harcama eklendi");
+        if (forceAdd) {
+          toast("Harcama eklendi (Bütçe aşıldı!)");
+        } else {
+          toast("Yeni harcama eklendi");
+        }
         setExpenseName("");
         setExpenseAmount("");
         setSelectedDate(new Date().toISOString().split("T")[0]);
@@ -199,6 +264,17 @@ const AddExpense = ({ budgetId, user, refreshData }) => {
       console.error("Harcama ekleme hatası:", error);
       toast("Harcama eklenirken bir hata oluştu");
     }
+  };
+
+  const handleBudgetWarningConfirm = async () => {
+    setShowBudgetWarning(false);
+    await onCreateExpense(true); // forceAdd = true
+    setPendingExpense(null);
+  };
+
+  const handleBudgetWarningCancel = () => {
+    setShowBudgetWarning(false);
+    setPendingExpense(null);
   };
 
   return (
@@ -250,13 +326,71 @@ const AddExpense = ({ budgetId, user, refreshData }) => {
           </div>
           <Button
             disabled={!(expenseName && expenseAmount && selectedDate)}
-            onClick={onCreateExpense}
+            onClick={handleExpenseSubmit}
             className="mt-5 w-full bg-blue-800 hover:bg-blue-900"
           >
             Ekle
           </Button>
         </div>
       </DialogContent>
+
+      {/* Bütçe Aşımı Uyarısı */}
+      <Dialog open={showBudgetWarning} onOpenChange={setShowBudgetWarning}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-orange-600">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
+              Bütçe Aşımı Uyarısı
+            </DialogTitle>
+            <DialogDescription className="text-gray-700">
+              Bu harcamayı eklerseniz bütçenizi aşacaksınız!
+              <br />
+              <br />
+              <strong>Bütçe Limiti:</strong>{" "}
+              {budgetAmount
+                ? new Intl.NumberFormat("tr-TR").format(budgetAmount)
+                : 0}{" "}
+              ₺
+              <br />
+              <strong>Eklenecek Tutar:</strong>{" "}
+              {pendingExpense
+                ? new Intl.NumberFormat("tr-TR").format(pendingExpense.amount)
+                : 0}{" "}
+              ₺
+              <br />
+              <br />
+              Yine de devam etmek istiyor musunuz?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={handleBudgetWarningCancel}
+              className="flex-1"
+            >
+              İptal Et
+            </Button>
+            <Button
+              onClick={handleBudgetWarningConfirm}
+              className="flex-1 bg-orange-500 hover:bg-orange-600"
+            >
+              Yine de Ekle
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };
@@ -320,7 +454,12 @@ function ExpensesScreen({ params }) {
       const result = await db
         .select()
         .from(Expenses)
-        .where(eq(Expenses.budgetId, parseInt(budgetId)))
+        .where(
+          and(
+            eq(Expenses.budgetId, parseInt(budgetId)),
+            eq(Expenses.createdBy, user?.primaryEmailAddress?.emailAddress)
+          )
+        )
         .orderBy(desc(Expenses.id));
 
       console.log("Expenses Result:", result);
@@ -348,18 +487,28 @@ function ExpensesScreen({ params }) {
 
   const deleteBudget = async () => {
     try {
-      // Önce ilgili harcamaları sil
+      // Önce sadece kullanıcının harcamalarını sil
       const deleteExpensesResult = await db
         .delete(Expenses)
-        .where(eq(Expenses.budgetId, parseInt(budgetId)))
+        .where(
+          and(
+            eq(Expenses.budgetId, parseInt(budgetId)),
+            eq(Expenses.createdBy, user?.primaryEmailAddress?.emailAddress)
+          )
+        )
         .returning();
 
       console.log("Silinen harcamalar:", deleteExpensesResult);
 
-      // Sonra bütçeyi sil
+      // Sonra sadece kullanıcının bütçesini sil
       const result = await db
         .delete(Budgets)
-        .where(eq(Budgets.id, parseInt(budgetId)))
+        .where(
+          and(
+            eq(Budgets.id, parseInt(budgetId)),
+            eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress)
+          )
+        )
         .returning();
 
       console.log("Silinen bütçe:", result);
@@ -536,6 +685,7 @@ function ExpensesScreen({ params }) {
         {budgetInfo && (
           <AddExpense
             budgetId={budgetId}
+            budgetAmount={budgetInfo.amount}
             user={user}
             refreshData={refreshData}
           />

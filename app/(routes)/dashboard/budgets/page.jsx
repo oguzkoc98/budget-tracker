@@ -6,6 +6,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import { DollarSign, Target, TrendingUp, AlertCircle } from "lucide-react";
 import BudgetList from "./_components/BudgetList";
 import { Card, CardContent } from "@/components/ui/card";
+import { useUser } from "@clerk/nextjs";
 
 function Budget() {
   const [budgetsList, setBudgetsList] = useState([]);
@@ -13,6 +14,7 @@ function Budget() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const { user } = useUser();
   const [stats, setStats] = useState({
     totalBudgets: 0,
     totalAmount: 0,
@@ -24,9 +26,11 @@ function Budget() {
 
   // Tüm bütçeleri ve harcamaları getir
   const getAllBudgets = async () => {
+    if (!user) return;
+
     setLoading(true);
     try {
-      // Bütçeleri ve toplam harcamalarını getir
+      // Bütçeleri ve toplam harcamalarını getir - sadece kullanıcının bütçeleri
       const result = await db
         .select({
           id: Budgets.id,
@@ -38,6 +42,7 @@ function Budget() {
         })
         .from(Budgets)
         .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+        .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
         .groupBy(Budgets.id, Budgets.name, Budgets.amount, Budgets.createdBy);
 
       setBudgetsList(result || []);
@@ -179,8 +184,10 @@ function Budget() {
   };
 
   useEffect(() => {
-    getAllBudgets();
-  }, []);
+    if (user) {
+      getAllBudgets();
+    }
+  }, [user]);
 
   const filteredBudgets = getFilteredBudgets();
 

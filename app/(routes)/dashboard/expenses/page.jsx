@@ -37,6 +37,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useUser } from "@clerk/nextjs";
 
 function ExpensesPage() {
   const [expensesList, setExpensesList] = useState([]);
@@ -50,6 +51,7 @@ function ExpensesPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const { user } = useUser();
   const [stats, setStats] = useState({
     totalExpenses: 0,
     totalAmount: 0,
@@ -61,9 +63,11 @@ function ExpensesPage() {
 
   // Tüm verileri getir
   const getAllExpenses = async () => {
+    if (!user) return;
+
     setLoading(true);
     try {
-      // Tüm harcamaları getir
+      // Sadece kullanıcının harcamalarını getir
       const result = await db
         .select({
           id: Expenses.id,
@@ -75,12 +79,16 @@ function ExpensesPage() {
         })
         .from(Expenses)
         .leftJoin(Budgets, eq(Expenses.budgetId, Budgets.id))
+        .where(eq(Expenses.createdBy, user?.primaryEmailAddress?.emailAddress))
         .orderBy(desc(Expenses.createdAt));
 
       setExpensesList(result);
 
-      // Bütçeleri getir
-      const budgetsResult = await db.select().from(Budgets);
+      // Sadece kullanıcının bütçelerini getir
+      const budgetsResult = await db
+        .select()
+        .from(Budgets)
+        .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress));
       setBudgetsList(budgetsResult);
 
       // İstatistikleri hesapla
@@ -304,8 +312,10 @@ function ExpensesPage() {
   }, [searchTerm, selectedBudget, dateRange, sortBy]);
 
   useEffect(() => {
-    getAllExpenses();
-  }, []);
+    if (user) {
+      getAllExpenses();
+    }
+  }, [user]);
 
   const filteredExpenses = getFilteredExpenses();
   const paginatedExpenses = getPaginatedExpenses();
